@@ -71,6 +71,7 @@ class SessionClient: SessionAdapterListener {
     private func performInitialize(deviceInfo: DeviceInfo) {
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
+            
             self.adapter?.sendInit(deviceInfo: deviceInfo, listener: self)
         }
     }
@@ -94,6 +95,7 @@ class SessionClient: SessionAdapterListener {
                 status = .IS_REINITIALIZING_SESSION
                 DispatchQueue.global(qos: .background).async { [weak self] in
                     guard let self = self else { return }
+                    
                     self.adapter?.sendInit(deviceInfo: deviceInfo, listener: self)
                 }
             } else {
@@ -113,6 +115,7 @@ class SessionClient: SessionAdapterListener {
         
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self, let session = self.currentSession else { return }
+            
             self.adapter?.sendRefreshAds(session: session, listener: self, zoneContexts: self.zoneContexts)
         }
     }
@@ -129,7 +132,7 @@ class SessionClient: SessionAdapterListener {
     }
     
     private func startPollingTimer() {
-        if (pollingTimerRunning || currentSession == nil || currentSession!.willNotServeAds()) {
+        if (pollingTimerRunning || currentSession == nil || currentSession?.willNotServeAds() == true) {
             AALogger.logInfo(message: "Ignoring Ad polling timer.")
             return
         }
@@ -137,8 +140,8 @@ class SessionClient: SessionAdapterListener {
         AALogger.logInfo(message: "Starting Ad polling timer.")
         
         refreshTimer =  Timer(
-            repeatMillis: currentSession!.refreshTime,
-            delayMillis: currentSession!.refreshTime,
+            repeatMillis: currentSession?.refreshTime ?? 0,
+            delayMillis: currentSession?.refreshTime ?? 0,
             timerAction: {
                 self.performRefresh()
             }

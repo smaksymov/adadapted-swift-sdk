@@ -25,6 +25,7 @@ class InterceptClient: SessionListener, InterceptAdapterListener {
         self.interceptListener = interceptListener
         backSerialQueue.async { [weak self] in
             guard let self = self else { return }
+            
             self.adapter.retrieve(session: session, adapterListener: self)
         }
     }
