@@ -52,10 +52,13 @@ class EventClient: SessionListener {
     }
     
     private static func performPublishAdEvents() {
-        guard let currentSession = session, !adEvents.isEmpty else {
+        guard let currentSession = session else {
             return
         }
+        
         EventClient.adEventsQueue.async {
+            guard !adEvents.isEmpty else { return }
+            
             let currentAdEvents = Array(adEvents)
             EventClient.adEvents.removeAll()
             EventClient.eventAdapter?.publishAdEvents(session: currentSession, adEvents: currentAdEvents)
